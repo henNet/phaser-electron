@@ -4,6 +4,9 @@ var config = {
   height: 600,
   parent: "game-container",
   backgroundColor: "#028af8",
+  input: {
+    gamepad: true,
+  },
   physics: {
     default: "arcade",
     arcade: {
@@ -12,7 +15,7 @@ var config = {
     },
   },
   scale: {
-    // mode: Phaser.Scale.RESIZE, // you can find another types in Phaser.Scale.ScaleModeType: RESIZE | FIT | ENVELOP ...
+    // mode: Phaser.Scale.FIT, // you can find another types in Phaser.Scale.ScaleModeType: RESIZE | FIT | ENVELOP ...
     autoCenter: Phaser.Scale.CENTER_BOTH,
   },
   scene: {
@@ -31,6 +34,7 @@ var score = 0;
 var scoreText;
 var gameOver;
 var gameOverText;
+var gamepadConnectedText;
 var alredyShowGameOver = false;
 var isFullscreen = true;
 
@@ -94,9 +98,9 @@ function create() {
     frameRate: 10,
     repeat: -1,
   });
-
   player.body.setGravityY(600);
 
+  /* Colliders */
   this.physics.add.collider(player, platforms);
   this.physics.add.collider(stars, platforms);
   this.physics.add.overlap(player, stars, collectStar, null, this);
@@ -104,6 +108,7 @@ function create() {
   this.physics.add.collider(player, bombs, hitBomb, null, this);
   this.physics.add.collider(bombs, bombs);
 
+  /* Inputs */
   cursors = this.input.keyboard.createCursorKeys();
   scoreText = this.add.text(16, 16, "Score: 0", {
     fontSize: "42px",
@@ -122,6 +127,21 @@ function create() {
     },
     this
   );
+
+  this.input.gamepad.on("connected", gamepadConnected);
+  gamepadConnectedText = this.add.text(610, 32, "", {
+    fontSize: "16px",
+    fill: "#16185A",
+    fontFamily: "Arial",
+    color: "#00f",
+  });
+}
+
+function gamepadConnected(gamepad, event) {
+  console.log("Gamepad connected");
+  this.gamepad = gamepad;
+  this.isGamePadConnected = true;
+  gamepadConnectedText.setText("Gamepad Connected");
 }
 
 function collectStar(player, star) {
@@ -158,17 +178,43 @@ function hitBomb(player, bomb) {
 }
 
 function update() {
+  if (this.input.gamepad.total === 0) {
+    gamepadConnectedText.setText("Gamepad Disconnected");
+  }
+
   if (cursors.left.isDown) {
     player.setVelocityX(-200);
-
+    console.log(cursors.left.isDown);
     player.anims.play("left", true);
   } else if (cursors.right.isDown) {
     player.setVelocityX(200);
-
     player.anims.play("right", true);
+
+    /* Verifica se ha algum gamepad */
+  } else if (this.input.gamepad.total !== 0) {
+    const pad = this.input.gamepad.getPad(0);
+
+    if (pad.A && player.body.touching.down) {
+      player.setVelocityY(-630);
+    }
+
+    if (pad.axes.length) {
+      const axisH = pad.axes[0].getValue();
+      const axisV = pad.axes[1].getValue();
+
+      if (axisH > 0.2) {
+        player.setVelocityX(200);
+        player.anims.play("right", true);
+      } else if (axisH < -0.2) {
+        player.setVelocityX(-200);
+        player.anims.play("left", true);
+      } else {
+        player.setVelocityX(0);
+        player.anims.play("turn");
+      }
+    }
   } else {
     player.setVelocityX(0);
-
     player.anims.play("turn");
   }
 
