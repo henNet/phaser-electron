@@ -3,10 +3,9 @@ const path = require("node:path");
 
 // Habilita o live reload no Electron e no FrontEnd da aplicação com a lib electron-reload
 // Assim que alguma alteração no código é feita
-require("electron-reload")(__dirname, {
-  // Note that the path to electron may vary according to the main file
-  electron: require(`${__dirname}/node_modules/electron`),
-});
+// require("electron-reload")(__dirname, {
+//   electron: require(`${__dirname}/node_modules/electron`),
+// });
 
 function criarJanela() {
   const config = {
@@ -25,7 +24,7 @@ function criarJanela() {
   janela.setIcon(path.join(__dirname, "assets/imgs/logo.png"));
   janela.setMenuBarVisibility(false);
   janela.maximize(); /* Para a app abrir em tela cheia */
-  janela.webContents.openDevTools();
+  // janela.webContents.openDevTools();
   janela.simpleFullScreen = false;
 
   ipcMain.on("set-full", (event, value) => {

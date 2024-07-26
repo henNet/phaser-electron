@@ -12,8 +12,9 @@
   - [x] Setas direira e esqueda movem o personagem
   - [x] Seta cima faz o personagem pular
   - [x] Tecla espaço faz o personagem pular
-- [ ] Jogabilidade Touch:
-- [ ] Jogabilidade Gamepad:
+- [x] Jogabilidade Gamepad:
+  - [x] Axes Sticks movem o personagem para direita e esquerda
+  - [x] Botão X faz o personagem pular
 
 ## Arquivos do Projeto
 
